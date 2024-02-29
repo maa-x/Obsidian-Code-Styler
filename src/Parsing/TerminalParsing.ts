@@ -13,31 +13,28 @@ export function addTerminalSyntaxHighlight(CodeMirror: typeof window.CodeMirror,
                 };
             },
             token: function(stream, state) {
-                if (stream.sol() || state.continuation) {
+                if (stream.sol()) {
                     const promptSettings = plugin.settings.terminalPrompt;
-                    const promptRegex = new RegExp(promptSettings.detect);
-                    const match = promptRegex.exec(stream.string);
-                    if (match && stream.match(match[0])) {
-                        const display = match[0].replace(promptRegex, promptSettings.display);
-                        stream.pos = match[1].length; // To move the stream position to the end of the prompt
+                    let promptRegex = new RegExp(promptSettings.detect);
+                    let match = stream.match(promptRegex, false) // Pattern must start with ^ for CodeMirror to treat it as a regex
+                    if (match) {
+                        stream.pos += match[0].length; // To move the stream position to the end of the prompt
                         state.inCommand = true;
-                        state.continuation = false;
+                        state.continuation = stream.string.trim().endsWith("\\");
                         return "meta"; // prompt
-                    } else if (stream.string.trim().endsWith("\\")){
-                        state.inCommand = false;
-                        state.continuation = true;
                     } else {
                         state.inCommand = false;
-                        state.continuation = false;
                     }
                 }
                 if (state.inCommand || state.continuation) {
                     const style = shellMode.token(stream, state.shellState);
-                    if (stream.eol() && stream.string.trim().endsWith("\\")) {
-                        state.continuation = true; // set the continuation state
+                    if (stream.eol() && !stream.string.trim().endsWith("\\")) {
+                        state.continuation = false;
                     }
-                    return style;
+                    return style; // tokens from shellMode
                 } else {
+                    state.inCommand = false;
+                    state.continuation = false;
                     stream.skipToEnd();
                     return null; // command output
                 }
