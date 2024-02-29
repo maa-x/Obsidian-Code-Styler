@@ -10,6 +10,7 @@ import { InlineCodeParameters, parseInlineCode } from "./Parsing/InlineCodeParsi
 import { createHeader, createInlineOpener, getLanguageIcon, getLineClass, isHeaderHidden } from "./CodeblockDecorating";
 import CodeStylerPlugin from "./main";
 import { addReferenceSyntaxHighlight } from "./SyntaxHighlighting";
+import { addTerminalSyntaxHighlight } from "./Parsing/TerminalParsing";
 
 interface SettingsState {
 	excludedLanguages: string;
@@ -24,6 +25,7 @@ export function createCodeblockCodeMirrorExtensions(settings: CodeStylerSettings
 		class CodeStylerViewPlugin implements PluginValue {
 			constructor() {
 				addReferenceSyntaxHighlight(window.CodeMirror);
+				addTerminalSyntaxHighlight(window.CodeMirror, plugin);
 			}
 			update(_update: ViewUpdate) {
 				//TODO (@mayurankv) Move selection back to original position - Currently done with setTimeout

@@ -839,6 +839,36 @@ export class SettingsTab extends PluginSettingTab {
 					}
 					//TODO (@mayurankv) Re-render (Test)
 				}));
+			let promptRegexTimeout: NodeJS.Timeout = setTimeout(()=>{});
+			new Setting(containerEl)
+				.setName("Terminal Mode Prompt Detection Regex")
+				.setDesc("Define a regex to detect terminal mode prompts. Use capture groups to capture specific components of the prompt (eg: `(?<user>\\w+)@(?<host>\\w+)` to capture the user and host).")
+				.addText(text => text
+					.setPlaceholder(`e.g. $(?<user>\\w+)@(?<host>\\w+)`)
+					.setValue(this.plugin.settings.terminalPrompt && this.plugin.settings.terminalPrompt.detect || "")
+					.onChange((value) => {
+						if (this.plugin.settings.terminalPrompt) {
+							this.plugin.settings.terminalPrompt.detect = value;
+							this.saveSettings();
+							clearTimeout(promptRegexTimeout);
+							promptRegexTimeout = setTimeout(()=>this.rerender(),1000);
+						}
+					}));
+			let promptReplaceTimeout: NodeJS.Timeout = setTimeout(()=>{});
+			new Setting(containerEl)
+				.setName("Terminal Mode Display Regex")
+				.setDesc("Define a regex to replace the prompt with a custom string. Use named capture groups to reference the components captured in the detection regex.")
+				.addText(text => text
+					.setPlaceholder(`e.g. $<user>@$<host>`)
+					.setValue(this.plugin.settings.terminalPrompt && this.plugin.settings.terminalPrompt.display || "")
+					.onChange((value) => {
+						if (this.plugin.settings.terminalPrompt) {
+							this.plugin.settings.terminalPrompt.display = value;
+							this.saveSettings();
+							clearTimeout(promptReplaceTimeout);
+							promptReplaceTimeout = setTimeout(()=>this.rerender(),1000);
+						}
+					}));
 	}
 	generateInlineCodeSettings(containerEl: HTMLElement) {
 		containerEl.createEl("h3", {text: "Inline Code Appearance"});

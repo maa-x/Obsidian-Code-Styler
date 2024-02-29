@@ -1,6 +1,9 @@
+import { addTerminalSyntaxHighlight } from './Parsing/TerminalParsing';
+
 const MODES = [
 	"reference",
 	"yaml-frontmatter",
+	"terminal"
 ];
 
 export function addModes() {

@@ -129,6 +129,10 @@ export interface CodeStylerSettings {
 	processedCodeblocksWhitelist: string;
 	redirectLanguages: Record<string,{colour?: Colour, icon?: string}>;
 	version: string;
+	terminalPrompt: {
+		detect: string; // Regex to detect how the terminal prompt is formatted
+		display: string; // Regex controlling how the prompt is displayed
+	}
 }
 
 export interface Language {
@@ -635,6 +639,10 @@ export const DEFAULT_SETTINGS: CodeStylerSettings = {
 	processedCodeblocksWhitelist: WHITELIST_CODEBLOCKS,
 	redirectLanguages: {},
 	version: "1.1.7",
+	terminalPrompt: {
+		detect: "\$ ",
+		display: "\$ ",
+	},
 };
 
 export function convertSettings(settings: CodeStylerSettings): CodeStylerSettings {
@@ -732,6 +740,7 @@ export const UPDATE_ICON = "&#xe348;";
 
 const PRISM_LANGUAGES: {[key: string]: string} = { // Prism Languages: https://prismjs.com/plugins/show-language/
 	// "none": "Plain text", // NOTE: Obsidian uses this for codeblocks without language names
+	"terminal": "Terminal",
 	"plain": "Plain text",
 	"plaintext": "Plain text",
 	"text": "Plain text",
